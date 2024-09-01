@@ -1,0 +1,190 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum UserRole {
+  ADMIN
+  USER
+}
+
+model Account {
+  id                       String  @id @default(cuid())
+  userId                   String  @unique
+  type                     String
+  provider                 String
+  providerAccountId        String
+  refresh_token            String?
+  access_token             String?
+  expires_at               Int?
+  token_type               String?
+  scope                    String?
+  id_token                 String?
+  session_state            String?
+  refresh_token_expires_in Int?
+  user                     User?   @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+}
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  username      String?   @unique
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  phone         String?
+  accounts      Account[]
+  sessions      Session[]
+
+  role UserRole @default(USER)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model NewsCategory {
+  id       Int    @id @default(autoincrement())
+  slug     String @unique
+  name     String
+  banner   String
+  seoImage String
+
+  news        News[]
+  billboardId Int
+  billboard   NewsBillboard @relation(fields: [billboardId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model News {
+  id          Int    @id @default(autoincrement())
+  slug        String @unique
+  title       String
+  description String
+  content     String
+  banner      String
+  seoImage    String
+
+  categoryId Int
+  category   NewsCategory @relation(fields: [categoryId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Product {
+  id          Int     @id @default(autoincrement())
+  slug        String  @unique
+  name        String
+  description String
+  content     String
+  seoImage    String
+  images      Image[]
+
+  categoryId Int
+  category   ProductCategory @relation(fields: [categoryId], references: [id])
+
+  subCategoryId Int
+  subCategory   ProductSubCategory @relation(fields: [subCategoryId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Image {
+  id        String   @id @default(uuid())
+  productId Int
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  url       String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([productId])
+}
+
+model ProductCategory {
+  id       Int    @id @default(autoincrement())
+  slug     String @unique
+  name     String
+  seoImage String
+
+  billboardId Int
+  billboard   ProductBillboard @relation(fields: [billboardId], references: [id])
+
+  subCategories ProductSubCategory[]
+  products      Product[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ProductSubCategory {
+  id   Int    @id @default(autoincrement())
+  slug String @unique
+  name String
+
+  categoryId Int
+  category   ProductCategory @relation(fields: [categoryId], references: [id])
+
+  products Product[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ProductBillboard {
+  id          Int    @id @default(autoincrement())
+  title       String
+  description String
+  imageUrl    String
+
+  categories ProductCategory[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model NewsBillboard {
+  id          Int    @id @default(autoincrement())
+  title       String
+  description String
+  imageUrl    String
+
+  newsCategories NewsCategory[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
