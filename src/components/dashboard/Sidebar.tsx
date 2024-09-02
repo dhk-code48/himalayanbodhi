@@ -113,6 +113,7 @@ export function DashboardSidebar({ links }: DashboardSidebarProps) {
                           <Fragment key={`link-fragment-${item.title}`}>
                             {isSidebarExpanded ? (
                               <Link
+                              prefetch={true}
                                 key={`link-${item.title}`}
                                 href={item.disabled ? "#" : `${item.href}`}
                                 className={cn(
@@ -136,6 +137,7 @@ export function DashboardSidebar({ links }: DashboardSidebarProps) {
                               <Tooltip key={`tooltip-${item.title}`}>
                                 <TooltipTrigger asChild>
                                   <Link
+                                  prefetch={true}
                                     key={`link-tooltip-${item.title}`}
                                     href={item.disabled ? "#" : item.href}
                                     className={cn(

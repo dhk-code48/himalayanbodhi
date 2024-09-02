@@ -2,6 +2,8 @@
 
 import React, { Component, ReactNode } from "react";
 
+import { Button } from "../ui/button";
+
 interface ErrorBoundaryProps {
   children: ReactNode;
 }
@@ -28,19 +30,20 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
     console.log({ error, errorInfo });
   }
 
+  handleRetry = () => {
+    // Refresh the page
+    window.location.reload();
+  };
+
   render() {
     // Check if an error is thrown
     if (this.state.hasError) {
       // You can render any custom fallback UI
       return (
         <div>
-          <h2>Oops, there is an error!</h2>
-          <button
-            type="button"
-            onClick={() => this.setState({ hasError: false })}
-          >
+          <Button type="button" onClick={this.handleRetry}>
             Try again?
-          </button>
+          </Button>
         </div>
       );
     }

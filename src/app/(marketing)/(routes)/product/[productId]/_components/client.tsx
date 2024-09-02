@@ -3,12 +3,12 @@ import getProduct from "@/actions/products/getProduct";
 import { CldImage } from "next-cloudinary";
 
 import { Badge } from "@/components/ui/badge";
+import ErrorBoundary from "@/components/layout/ErrorBoundary";
 import MaxWidthWrapper from "@/components/shared/MaxWidthWrapper";
 import { ProductsSkeleton } from "@/components/shared/SectionSkeleton";
 
 import ProductImages from "./ProductImages";
 import RelatedProducts from "./RelatedProducts";
-import ErrorBoundary from "@/components/layout/ErrorBoundary";
 
 const Client = ({ id }: { id: number }) => {
   const product = use(getProduct(id));
@@ -29,18 +29,21 @@ const Client = ({ id }: { id: number }) => {
               <Badge>{product.category.name}</Badge>
               <Badge>{product.subCategory.name}</Badge>
             </div>
-            <p>{product.content}</p>
+            <div
+              className="prose" // Tailwind CSS class for styled content
+              dangerouslySetInnerHTML={{ __html: product.content }}
+            />
           </div>
         </div>
       </MaxWidthWrapper>
 
       <MaxWidthWrapper className="my-20 space-y-5">
         <h1 className="font-display text-xl font-semibold">Related Products</h1>
-          <ErrorBoundary>
-            <Suspense fallback={<ProductsSkeleton />}>
-              <RelatedProducts categoryId={product.categoryId} />
-            </Suspense>
-          </ErrorBoundary>
+        <ErrorBoundary>
+          <Suspense fallback={<ProductsSkeleton />}>
+            <RelatedProducts categoryId={product.categoryId} />
+          </Suspense>
+        </ErrorBoundary>
       </MaxWidthWrapper>
     </>
   );

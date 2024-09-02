@@ -90,10 +90,13 @@ export default function HeroSlider({ news }: { news: News[] }) {
                 />
               </div>
               <div className="absolute inset-x-4 bottom-4 h-fit rounded-lg bg-primary p-4 text-primary-foreground shadow-lg md:bottom-10 md:left-10 md:right-auto md:max-w-xl md:p-6">
-                <h2 className="mb-2 text-2xl font-bold md:text-3xl">
+                <h2 className="mb-2 line-clamp-1 text-xl font-bold md:line-clamp-2 md:text-3xl">
                   {slide.title}
                 </h2>
-                <p className="mb-4 text-sm md:text-base">{slide.description}</p>
+                <p className="mb-4 line-clamp-2 text-sm md:line-clamp-3 md:text-base">
+                  {slide.description}
+                </p>
+
                 <Button
                   variant="secondary"
                   className="w-full transition-colors md:w-auto"

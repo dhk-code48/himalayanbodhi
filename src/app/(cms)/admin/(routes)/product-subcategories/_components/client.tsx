@@ -1,45 +1,70 @@
 import * as React from "react";
-import getAllProductBillboards from "@/actions/products/getAllProductBillboard";
 import getAllProductCategories from "@/actions/products/getAllProductCategories";
 import getAllProductSubCategories from "@/actions/products/getAllProductSubCategories";
 
+import { cn } from "@/lib/utils";
 import { DataTable } from "@/components/dashboard/DataTable";
 
 import Action from "./action";
 import { columns } from "./columns";
 
-interface NewsCategoriesClientProps
-  extends React.HTMLAttributes<HTMLDivElement> {}
+interface ProductCategoriesClientProps
+  extends React.HTMLAttributes<HTMLDivElement> {
+  categories: any[];
+  subCategories: any[];
+}
 
-export function Client({ className, ...props }: NewsCategoriesClientProps) {
+export async function fetchProductCategories() {
+  return await getAllProductCategories({});
+}
+
+export async function fetchProductSubCategories() {
+  return await getAllProductSubCategories();
+}
+
+export function Client({
+  categories,
+  subCategories,
+  className,
+  ...props
+}: ProductCategoriesClientProps) {
+  const columnsData = subCategories.map((e) => ({
+    ...e,
+    allCategories: categories,
+  }));
+
   return (
-    <div className={className} {...props}>
-      <Client.Action />
-      <Client.Body />
+    <div className={cn("space-x-2 space-y-2", className)} {...props}>
+      <Client.Action categories={categories} />
+      <Client.Body data={columnsData} />
     </div>
   );
 }
 
-Client.Action = function FormComponent({
+Client.Action = function ActionComponent({
+  categories,
   className,
   ...props
-}: React.HTMLAttributes<HTMLDivElement>) {
-  const categories = React.use(getAllProductCategories({}));
-  return <Action categories={categories} />;
+}: React.HTMLAttributes<HTMLDivElement> & { categories: any[] }) {
+  return (
+    <div
+      className={cn("flex w-full justify-start md:justify-end", className)}
+      {...props}
+    >
+      {" "}
+      <Action categories={categories} />
+    </div>
+  );
 };
 
 Client.Body = function BodyComponent({
+  data,
   className,
   ...props
-}: React.HTMLAttributes<HTMLDivElement>) {
-  const data = React.use(getAllProductSubCategories());
-  const categories = React.use(
-    getAllProductCategories({ subCategories: true }),
-  );
-  const columnsData = data.map((e) => ({ ...e, allCategories: categories }));
+}: React.HTMLAttributes<HTMLDivElement> & { data: any[] }) {
   return (
     <div className={className} {...props}>
-      <DataTable columns={columns} data={columnsData} />
+      <DataTable columns={columns} data={data} />
     </div>
   );
 };

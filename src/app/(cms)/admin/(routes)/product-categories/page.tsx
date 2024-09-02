@@ -4,7 +4,27 @@ import { DashboardHeading } from "@/components/dashboard/Heading";
 import ErrorBoundary from "@/components/layout/ErrorBoundary";
 import { TableSkeleton } from "@/components/shared/TableSkeleton";
 
-import { Client } from "./_components/client";
+import {
+  Client,
+  fetchProductBillboards,
+  fetchProductCategories,
+} from "./_components/client";
+
+// Fetch all data in parallel
+async function fetchAllProductData() {
+  const [billboards, categories] = await Promise.all([
+    fetchProductBillboards(),
+    fetchProductCategories(),
+  ]);
+  return { billboards, categories };
+}
+
+// Loader component using Suspense
+function ClientWithSuspense() {
+  const { billboards, categories } = React.use(fetchAllProductData());
+
+  return <Client billboards={billboards} categories={categories} />;
+}
 
 const CMSProducts = () => {
   return (
@@ -14,11 +34,10 @@ const CMSProducts = () => {
           heading="Products Category"
           text="Manage your page products category here"
         />
-        <Client.Action />
       </div>
       <ErrorBoundary>
-        <Suspense fallback={<TableSkeleton columns={5} rows={5} />}>
-          <Client.Body />
+        <Suspense fallback={<TableSkeleton />}>
+          <ClientWithSuspense />
         </Suspense>
       </ErrorBoundary>
     </>

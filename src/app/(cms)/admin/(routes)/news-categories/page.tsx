@@ -1,12 +1,27 @@
 import React, { Suspense } from "react";
+import getNewsAllBillboards from "@/actions/news/getAllNewsBillboards";
+import getNewsCategories from "@/actions/news/getAllNewsCategories";
 
 import { Skeleton } from "@/components/ui/skeleton";
 import { DashboardHeading } from "@/components/dashboard/Heading";
 import ErrorBoundary from "@/components/layout/ErrorBoundary";
-import { SkeletonSection } from "@/components/shared/SectionSkeleton";
 import { TableSkeleton } from "@/components/shared/TableSkeleton";
 
 import { Client } from "./_components/client";
+
+async function fetchAllData() {
+  const [billboards, categories] = await Promise.all([
+    getNewsAllBillboards(),
+    getNewsCategories(),
+  ]);
+  return { billboards, categories };
+}
+
+function ClientWithSuspense() {
+  const { billboards, categories } = React.use(fetchAllData());
+
+  return <Client billboards={billboards} categories={categories} />;
+}
 
 const NewsCategoriesPage = () => {
   return (
@@ -16,19 +31,13 @@ const NewsCategoriesPage = () => {
           heading="News Categories"
           text="Manage your news by creating different categories"
         />
-        <ErrorBoundary>
-          <Suspense fallback={<Skeleton className="h-5 w-10" />}>
-            <Client.Action />
-          </Suspense>
-        </ErrorBoundary>
       </div>
-      <div>
-        <ErrorBoundary>
-          <Suspense fallback={<TableSkeleton columns={5} rows={5} />}>
-            <Client.Body />
-          </Suspense>
-        </ErrorBoundary>
-      </div>
+
+      <ErrorBoundary>
+        <Suspense fallback={<TableSkeleton />}>
+          <ClientWithSuspense />
+        </Suspense>
+      </ErrorBoundary>
     </>
   );
 };

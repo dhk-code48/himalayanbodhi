@@ -5,9 +5,9 @@ import { NewsBillboard, NewsCategory } from "@prisma/client";
 
 import { prisma } from "@/lib/prisma";
 
-type GetNewsCategoriesType = (NewsCategory & { billboard: NewsBillboard })[];
+type GetAllNewsCategoriesType = (NewsCategory & { billboard: NewsBillboard })[];
 
-export default async function getNewsCategories(): Promise<GetNewsCategoriesType> {
+export default async function getAllNewsCategories(): Promise<GetAllNewsCategoriesType> {
   const data = await prisma.newsCategory.findMany({
     include: {
       billboard: true,

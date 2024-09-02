@@ -110,14 +110,9 @@ export const QuickViewModal: React.FC<QuickViewModalProps> = ({
           <h2 className="text-3xl font-bold text-gray-900">{product.name}</h2>
 
           <p className="mb-6 text-gray-600">{product.description}</p>
-          <div className="mb-6 space-y-4">
-            <div className="flex items-center">
-              <span className="font-medium text-gray-700">
-                Origin: {product.content}
-              </span>
-            </div>
-          </div>
+
           <Link
+            onClick={() => closeQuickView()}
             href={`/product/${product.id}`}
             className={buttonVariants({ rounded: "full" })}
           >

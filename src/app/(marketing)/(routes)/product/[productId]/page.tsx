@@ -1,4 +1,7 @@
-import React, { FC } from "react";
+import React, { FC, Suspense } from "react";
+
+import ErrorBoundary from "@/components/layout/ErrorBoundary";
+import { SkeletonSection } from "@/components/shared/SectionSkeleton";
 
 import Client from "./_components/client";
 
@@ -10,9 +13,11 @@ interface pageProps {
 
 const ProductPage: FC<pageProps> = ({ params }) => {
   return (
-    <>
-      <Client id={parseInt(params.productId)} />
-    </>
+    <ErrorBoundary>
+      <Suspense fallback={<SkeletonSection />}>
+        <Client id={parseInt(params.productId)} />
+      </Suspense>
+    </ErrorBoundary>
   );
 };
 

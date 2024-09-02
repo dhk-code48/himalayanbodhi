@@ -1,49 +1,66 @@
 import * as React from "react";
 import getAllNews from "@/actions/news/getAllNews";
-import getNewsAllCategories from "@/actions/news/getAllNewsCategories";
-import getNewsCategories from "@/actions/news/getAllNewsCategories";
+import getAllNewsCategories from "@/actions/news/getAllNewsCategories";
 
 import { cn } from "@/lib/utils";
 import { DataTable } from "@/components/dashboard/DataTable";
-import NewsCategoryForm from "@/components/forms/NewsCategoryForm";
 
 import Action from "./action";
 import { columns } from "./columns";
 
 interface NewsCategoriesClientProps
-  extends React.HTMLAttributes<HTMLDivElement> {}
+  extends React.HTMLAttributes<HTMLDivElement> {
+  categories: any[];
+  data: any[];
+}
 
-export function Client({ className, ...props }: NewsCategoriesClientProps) {
+export async function fetchCategories() {
+  return await getAllNewsCategories();
+}
+
+export async function fetchNewsData() {
+  return await getAllNews({});
+}
+
+export function Client({
+  categories,
+  data,
+  className,
+  ...props
+}: NewsCategoriesClientProps) {
+  const columnsData = data.map((i) => ({ ...i, allCategories: categories }));
+
   return (
-    <div className={cn(className)} {...props}>
-      <Client.Action />
-      <Client.Body />
+    <div className={cn("space-x-2 space-y-2", className)} {...props}>
+      <Client.Action categories={categories} />
+      <Client.Body data={columnsData} />
     </div>
   );
 }
 
-Client.Action = function FormComponent({
+Client.Action = function ActionComponent({
+  categories,
   className,
   ...props
-}: React.HTMLAttributes<HTMLDivElement>) {
-  const categories = React.use(getNewsAllCategories());
+}: React.HTMLAttributes<HTMLDivElement> & { categories: any[] }) {
   return (
-    <div className={className} {...props}>
+    <div
+      className={cn("flex w-full justify-start md:justify-end", className)}
+      {...props}
+    >
       <Action categories={categories} />
     </div>
   );
 };
 
 Client.Body = function BodyComponent({
+  data,
   className,
   ...props
-}: React.HTMLAttributes<HTMLDivElement>) {
-  const data = React.use(getAllNews({}));
-  const allCategories = React.use(getNewsAllCategories());
-  const columnsData = data.map((i) => ({ ...i, allCategories }));
+}: React.HTMLAttributes<HTMLDivElement> & { data: any[] }) {
   return (
     <div className={className} {...props}>
-      <DataTable columns={columns} data={columnsData} />
+      <DataTable columns={columns} data={data} />
     </div>
   );
 };

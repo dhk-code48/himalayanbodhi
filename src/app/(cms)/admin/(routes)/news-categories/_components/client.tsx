@@ -1,47 +1,60 @@
 import * as React from "react";
-import getNewsAllBillboards from "@/actions/news/getAllNewsBillboards";
-import getNewsCategories from "@/actions/news/getAllNewsCategories";
 
+import { cn } from "@/lib/utils";
 import { DataTable } from "@/components/dashboard/DataTable";
-import NewsCategoryForm from "@/components/forms/NewsCategoryForm";
 
 import Action from "./action";
 import { columns } from "./columns";
 
+// Props interface updated to include billboards and categories
 interface NewsCategoriesClientProps
-  extends React.HTMLAttributes<HTMLDivElement> {}
+  extends React.HTMLAttributes<HTMLDivElement> {
+  billboards: any[]; // Replace 'any' with the actual type of billboards
+  categories: any[]; // Replace 'any' with the actual type of categories
+}
 
-export function Client({ className, ...props }: NewsCategoriesClientProps) {
+export function Client({
+  billboards,
+  categories,
+  className,
+  ...props
+}: NewsCategoriesClientProps) {
+  const columnsData = categories.map((i) => ({
+    ...i,
+    allBillboards: billboards,
+  }));
+
   return (
-    <div className={className} {...props}>
-      <Client.Action />
-      <Client.Body />
+    <div className={cn("space-x-2 space-y-2", className)} {...props}>
+      <Client.Action billboards={billboards} />
+      <Client.Body data={columnsData} />
     </div>
   );
 }
 
-Client.Action = function FormComponent({
+Client.Action = function ActionComponent({
+  billboards,
   className,
   ...props
-}: React.HTMLAttributes<HTMLDivElement>) {
-  const billboards = React.use(getNewsAllBillboards());
+}: React.HTMLAttributes<HTMLDivElement> & { billboards: any[] }) {
   return (
-    <div className={className} {...props}>
+    <div
+      className={cn("flex w-full justify-start md:justify-end", className)}
+      {...props}
+    >
       <Action billboards={billboards} />
     </div>
   );
 };
 
 Client.Body = function BodyComponent({
+  data,
   className,
   ...props
-}: React.HTMLAttributes<HTMLDivElement>) {
-  const data = React.use(getNewsCategories());
-  const allBillboards = React.use(getNewsAllBillboards());
-  const columnsData = data.map((i) => ({ ...i, allBillboards }));
+}: React.HTMLAttributes<HTMLDivElement> & { data: any[] }) {
   return (
     <div className={className} {...props}>
-      <DataTable columns={columns} data={columnsData} />
+      <DataTable columns={columns} data={data} />
     </div>
   );
 };
